@@ -49,4 +49,13 @@ Make sure you have the following installed on your machine:
 6. **Contributing**: Guidelines for contributing to the project, including forking the repo and submitting a pull request.
 7. **License & Acknowledgements**: Project license and credit to tools used in the project.
 
+---
+## Contact
+
+Feel free to reach out for any questions or suggestions.
+
+- **Email**: [usama.forayeje@example.com](mailto:usama.forayeje@gmail.com)
+- **LinkedIn**: [Usama Forayeje](https://www.linkedin.com/in/usama-forayeje)
+
+❤️ Built with love by **Usama Forayeje**.
 
