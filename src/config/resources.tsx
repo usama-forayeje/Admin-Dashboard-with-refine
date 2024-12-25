@@ -27,12 +27,12 @@ export const resources: IResourceItem[] = [
     },
   },
   {
-    name: "orders",
-    list: "/orders",
-    create: "/orders/new",
-    edit: "/orders/edit/:id",
+    name: "tasks",
+    list: "/tasks",
+    create: "/tasks/new",
+    edit: "/tasks/edit/:id",
     meta: {
-      label: "Orders",
+      label: "Tasks",
       icon: <OrderedListOutlined />,
     },
   },
