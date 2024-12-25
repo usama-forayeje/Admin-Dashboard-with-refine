@@ -33,7 +33,6 @@ const wsClient = createClient({ url: WS_URL });
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <AntdApp>
           <DevtoolsProvider>
