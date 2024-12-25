@@ -1,106 +1,90 @@
 import React from "react";
 
-import { useForm } from "@refinedev/antd";
-import { HttpError, useInvalidate } from "@refinedev/core";
-import { GetFields, GetVariables } from "@refinedev/nestjs-query";
+import { useForm } from "@refinedev/antd"; // useForm hook is used to manage the form's state and actions
+import { HttpError, useInvalidate } from "@refinedev/core"; // HttpError and useInvalidate hooks for error handling and cache invalidation
+import { GetFields, GetVariables } from "@refinedev/nestjs-query"; // Types for fields and variables
 
-import { Form, Skeleton } from "antd";
+import { Form, Skeleton } from "antd"; // Form and Skeleton components from Ant Design
 
-import { Text } from "@/components";
-import { Task } from "@/graphql/schema.types";
+import { Text } from "@/components"; // Custom Text component to display task title
+import { Task } from "@/graphql/schema.types"; // Task type from GraphQL schema
 import {
   UpdateTaskMutation,
   UpdateTaskMutationVariables,
-} from "@/graphql/types";
+} from "@/graphql/types"; // Mutation types for updating the task
 
-import { UPDATE_TASK_MUTATION } from "@/graphql/mutations";
+import { UPDATE_TASK_MUTATION } from "@/graphql/mutations"; // GraphQL mutation to update the task
 
+// TitleInput component to display and edit task title
 const TitleInput = ({
   value,
   onChange,
 }: {
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: string; // Task title
+  onChange?: (value: string) => void; // Callback to handle title changes
 }) => {
   const onTitleChange = (newTitle: string) => {
-    onChange?.(newTitle);
+    onChange?.(newTitle); // Call the onChange function when the title changes
   };
 
   return (
     <Text
       editable={{
-        onChange: onTitleChange,
+        onChange: onTitleChange, // Function to handle title change
       }}
       style={{ width: "98%" }}
     >
-      {value}
+      {value} {/* Display the current task title */}
     </Text>
   );
 };
 
 type Props = {
   initialValues: {
-    title?: Task["title"];
+    title?: Task["title"]; // Initial task title
   };
-  isLoading?: boolean;
+  isLoading?: boolean; // Loading state
 };
 
+// TitleForm component that allows editing and saving the task title
 export const TitleForm = ({ initialValues, isLoading }: Props) => {
   /**
-   * useInvalidate is used to invalidate the state of a particular resource or dataProvider
-   * Means, it will refetch the data from the server and update the state of the resource or dataProvider. We can also specify which part of the state we want to invalidate.
-   * We typically use this hook when we want to refetch the data from the server after a mutation is successful.
-   *
-   * https://refine.dev/docs/data/hooks/use-invalidate/
+   * useInvalidate hook is used to refresh the task list after a mutation is successful.
    */
   const invalidate = useInvalidate();
 
-  // use the useForm hook to manage the form for adding a title to a task
+  // useForm hook is used to manage the form's state and actions, including mutation handling
   const { formProps } = useForm<
-    GetFields<UpdateTaskMutation>,
-    HttpError,
-    /**
-     * Pick is a utility type from typescript that allows you to create a new type from an existing type by picking some properties from it.
-     * https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
-     *
-     * Pick<Type, Keys>
-     * Type -> the type from which we want to pick the properties
-     * Keys -> the properties that we want to pick
-     */
-    Pick<GetVariables<UpdateTaskMutationVariables>, "title">
+    GetFields<UpdateTaskMutation>, // Type for mutation result fields
+    HttpError, // Type for error handling
+    Pick<GetVariables<UpdateTaskMutationVariables>, "title"> // Pick only the 'title' field for updating
   >({
     queryOptions: {
-      // disable the query to prevent fetching data on component mount
-      enabled: false,
+      enabled: false, // Disable query fetching on component mount
     },
-    redirect: false, // disable redirection
-    warnWhenUnsavedChanges: false, // disable warning when there are unsaved changes
+    redirect: false, // Disable redirect after mutation
+    warnWhenUnsavedChanges: false, // Disable warning for unsaved changes
     /**
-     * autoSave is used to automatically save the form when the value of the form changes. It accepts an object with 1 property:
-     * enabled: boolean - whether to enable autoSave or not
-     *
-     * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-form/#autosave
-     *
-     * In this case, we are enabling autoSave.
+     * autoSave option saves the form data automatically when changed
      */
     autoSave: {
-      enabled: true,
+      enabled: true, // Enable auto-save
     },
-    // invalidate the list page of the tasks resource when the mutation is successful
+    // Refresh task list after the mutation is successful
     onMutationSuccess: () => {
-      // refetch the list page of the tasks resource
-      invalidate({ invalidates: ["list"], resource: "tasks" });
+      invalidate({ invalidates: ["list"], resource: "tasks" }); // Refresh the task list
     },
     meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
+      gqlMutation: UPDATE_TASK_MUTATION, // Mutation to update the task
     },
   });
 
-  // set the title of the form to the title of the task
+  // When initialValues changes, update the form's value
   React.useEffect(() => {
-    formProps.form?.setFieldsValue(initialValues);
+    formProps.form?.setFieldsValue(initialValues); // Set form values based on initialValues
   }, [initialValues.title]);
 
+  // Show a skeleton loader while loading data
   if (isLoading) {
     return (
       <Skeleton.Input
@@ -111,6 +95,7 @@ export const TitleForm = ({ initialValues, isLoading }: Props) => {
     );
   }
 
+  // Render the form with the title input field
   return (
     <Form {...formProps} initialValues={initialValues}>
       <Form.Item noStyle name="title">

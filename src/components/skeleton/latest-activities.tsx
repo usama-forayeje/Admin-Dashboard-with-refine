@@ -1,33 +1,38 @@
 import { List, Skeleton } from "antd";
 
+// LatestActivitiesSkeleton component, used to display a loading skeleton for activity list items
 const LatestActivitiesSkeleton = () => {
   return (
     <List.Item>
+      {/* List item meta data */}
       <List.Item.Meta
-        avatar={
+        avatar={ 
+          // Skeleton avatar as a placeholder for the user image
           <Skeleton.Avatar
-            active
-            size={48}
-            shape="square"
+            active // Adds animation to show it's loading
+            size={48} // Avatar size
+            shape="square" // Makes the avatar square
             style={{
-              borderRadius: "4px",
+              borderRadius: "4px", // Rounded corners for the avatar
             }}
           />
         }
-        title={
+        title={ 
+          // Skeleton button as a placeholder for the title
           <Skeleton.Button
-            active
+            active // Adds animation to show it's loading
             style={{
-              height: "16px",
+              height: "16px", // Sets the height of the skeleton button
             }}
           />
         }
-        description={
+        description={ 
+          // Skeleton button as a placeholder for the description
           <Skeleton.Button
-            active
+            active // Adds animation to show it's loading
             style={{
-              width: "300px",
-              height: "16px",
+              width: "300px", // Sets the width of the skeleton button
+              height: "16px", // Sets the height of the skeleton button
             }}
           />
         }

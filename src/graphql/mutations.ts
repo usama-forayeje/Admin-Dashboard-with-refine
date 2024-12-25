@@ -1,11 +1,10 @@
 import gql from "graphql-tag";
 
-// Mutation to update user
+// Mutation to update user information
 export const UPDATE_USER_MUTATION = gql`
-  # The ! after the type means that it is required
+  # The ! after the type means this field is required
   mutation UpdateUser($input: UpdateOneUserInput!) {
-    # call the updateOneUser mutation with the input and pass the $input argument
-    # $variableName is a convention for GraphQL variables
+    # Calls the updateOneUser mutation with the input data
     updateOneUser(input: $input) {
       id
       name
@@ -17,7 +16,7 @@ export const UPDATE_USER_MUTATION = gql`
   }
 `;
 
-// Mutation to create company
+// Mutation to create a new company
 export const CREATE_COMPANY_MUTATION = gql`
   mutation CreateCompany($input: CreateOneCompanyInput!) {
     createOneCompany(input: $input) {
@@ -51,7 +50,7 @@ export const UPDATE_COMPANY_MUTATION = gql`
   }
 `;
 
-// Mutation to update task stage of a task
+// Mutation to update the stage of a task
 export const UPDATE_TASK_STAGE_MUTATION = gql`
   mutation UpdateTaskStage($input: UpdateOneTaskInput!) {
     updateOneTask(input: $input) {
@@ -74,7 +73,7 @@ export const CREATE_TASK_MUTATION = gql`
   }
 `;
 
-// Mutation to update a task details
+// Mutation to update task details
 export const UPDATE_TASK_MUTATION = gql`
   mutation UpdateTask($input: UpdateOneTaskInput!) {
     updateOneTask(input: $input) {

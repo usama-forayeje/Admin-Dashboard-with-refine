@@ -1,46 +1,79 @@
-import { Button, Popover } from "antd";
-import CustomAvatar from "../custom-avatar";
-import { useGetIdentity } from "@refinedev/core";
+import { Button, Popover } from "antd"; // Ant Design components for button and popover
+import CustomAvatar from "../custom-avatar"; // Custom avatar component
+import { useGetIdentity } from "@refinedev/core"; // Hook to get the current user's identity
 
-import type {User } from '@/graphql/schema.types'
-import { Text } from "../text";
-import { SettingOutlined } from "@ant-design/icons";
-import { useState } from "react";
-import { AccountSettings } from "./account-settings";
+import type { User } from "@/graphql/schema.types"; // Type definition for user
+import { Text } from "../text"; // Custom text component
+import { SettingOutlined } from "@ant-design/icons"; // Setting icon
+import { useState } from "react"; // React hook to manage state
+import { AccountSettings } from "./account-settings"; // Account settings component
 
 function CurrentUser() {
-  const [isOpen, setIsOpen] = useState(false)
-  const {data: user} = useGetIdentity<User>()
+  // State to control the visibility of the account settings drawer
+  const [isOpen, setIsOpen] = useState(false);
 
+  // Get the current user's data
+  const { data: user } = useGetIdentity<User>();
+
+  // Content for the popover
   const content = (
-    <div style={{display: 'flex', flexDirection: 'column'}}>
-      <Text strong style={{padding: '12px 20px'}}>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {/* User name displayed in the popover */}
+      <Text strong style={{ padding: "12px 20px" }}>
         {user?.name}
       </Text>
-      <div style={{borderTop: '1px solid #d9d9d9', padding: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <Button style={{textAlign: 'left' , }} icon={<SettingOutlined />} type="text" block onClick={() => setIsOpen(true)} >
+      {/* Button to open account settings */}
+      <div
+        style={{
+          borderTop: "1px solid #d9d9d9",
+          padding: "4px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+        }}
+      >
+        <Button
+          style={{ textAlign: "left" }}
+          icon={<SettingOutlined />} // Icon for account settings
+          type="text"
+          block // Button takes full width
+          onClick={() => setIsOpen(true)} // Opens the account settings drawer
+        >
           Account Settings
         </Button>
       </div>
     </div>
-  )
+  );
 
   return (
     <>
+      {/* Popover component */}
       <Popover
-        placement="bottomRight"
-        trigger="click"
-        overlayInnerStyle={{ padding: 0 }}
-        overlayStyle={{ zIndex: 999 }}
-        content={content}
+        placement="bottomRight" // Popover appears at the bottom-right
+        trigger="click" // Popover opens on click
+        overlayInnerStyle={{ padding: 0 }} // Removes extra padding in the popover
+        overlayStyle={{ zIndex: 999 }} // Ensures popover is above other elements
+        content={content} // Popover content
       >
-        <CustomAvatar name={user?.name} src={user?.avatarUrl} size='default' style={{cursor: 'pointer'}} />
+        {/* Avatar for the current user */}
+        <CustomAvatar
+          name={user?.name} // Displays user's initials or name
+          src={user?.avatarUrl} // Displays user's profile picture if available
+          size="default"
+          style={{ cursor: "pointer" }} // Cursor changes to pointer on hover
+        />
       </Popover>
+
+      {/* Account settings drawer */}
       {user && (
-        <AccountSettings opened={isOpen} setOpened={setIsOpen} userId={user?.id} />
+        <AccountSettings
+          opened={isOpen} // Controls visibility of the drawer
+          setOpened={setIsOpen} // Function to toggle the drawer's visibility
+          userId={user?.id} // Passes the user's ID to the account settings component
+        />
       )}
     </>
   );
 }
 
-export default CurrentUser;
+export default CurrentUser; // Exporting the component

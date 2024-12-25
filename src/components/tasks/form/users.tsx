@@ -1,78 +1,65 @@
-import { useForm, useSelect } from "@refinedev/antd";
-import { HttpError } from "@refinedev/core";
+import { useForm, useSelect } from "@refinedev/antd"; // useForm and useSelect hooks from Refine library
+import { HttpError } from "@refinedev/core"; // HttpError for error handling
 import {
   GetFields,
   GetFieldsFromList,
   GetVariables,
-} from "@refinedev/nestjs-query";
+} from "@refinedev/nestjs-query"; // Types for fetching fields and variables
 
-import { Button, Form, Select, Space } from "antd";
+import { Button, Form, Select, Space } from "antd"; // Ant Design components for the form
 
 import {
   UpdateTaskMutation,
   UpdateTaskMutationVariables,
   UsersSelectQuery,
-} from "@/graphql/types";
+} from "@/graphql/types"; // GraphQL types for mutations and queries
 
-import { USERS_SELECT_QUERY } from "@/graphql/queries";
-import { UPDATE_TASK_MUTATION } from "@/graphql/mutations";
+import { USERS_SELECT_QUERY } from "@/graphql/queries"; // Query to fetch users
+import { UPDATE_TASK_MUTATION } from "@/graphql/mutations"; // Mutation to update the task
 
 type Props = {
   initialValues: {
-    userIds?: { label: string; value: string }[];
+    userIds?: { label: string; value: string }[]; // List of selected user IDs
   };
-  cancelForm: () => void;
+  cancelForm: () => void; // Function to cancel the form
 };
 
 export const UsersForm = ({ initialValues, cancelForm }: Props) => {
-  // use the useForm hook to manage the form to add users to a task (assign task to users)
-  const { formProps, saveButtonProps } = useForm<
-    GetFields<UpdateTaskMutation>,
-    HttpError,
-    /**
-     * Pick is a utility type from typescript that allows you to create a new type from an existing type by picking some properties from it.
-     * https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
-     *
-     * Pick<Type, Keys>
-     * Type -> the type from which we want to pick the properties
-     * Keys -> the properties that we want to pick
-     */
-    Pick<GetVariables<UpdateTaskMutationVariables>, "userIds">
+  // use the useForm hook to manage the form for assigning users to a task
+  const { formProps, saveButtonProps } = useForm< 
+    GetFields<UpdateTaskMutation>, // Type for mutation result fields
+    HttpError, // Type for error handling
+    Pick<GetVariables<UpdateTaskMutationVariables>, "userIds"> // Pick only the 'userIds' field for updating
   >({
     queryOptions: {
-      // disable the query to prevent fetching data on component mount
-      enabled: false,
+      enabled: false, // Disable query fetching on mount
     },
-    redirect: false, // disable redirection
+    redirect: false, // Disable redirection after mutation
     onMutationSuccess: () => {
-      // when the mutation is successful, call the cancelForm function to close the form
+      // Close the form on successful mutation
       cancelForm();
     },
-    // perform the mutation when the form is submitted
     meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
+      gqlMutation: UPDATE_TASK_MUTATION, // GraphQL mutation for updating the task
     },
   });
 
-  // use the useSelect hook to fetch the list of users from the server and display them in a select component
+  // use the useSelect hook to fetch the list of users and display them in a select component
   const { selectProps } = useSelect<GetFieldsFromList<UsersSelectQuery>>({
-    // specify the resource from which we want to fetch the data
-    resource: "users",
-    // specify the query that should be performed
+    resource: "users", // Specify the resource to fetch (users)
     meta: {
-      gqlQuery: USERS_SELECT_QUERY,
+      gqlQuery: USERS_SELECT_QUERY, // GraphQL query for fetching users
     },
-    // specify the label for the select component
-    optionLabel: "name",
+    optionLabel: "name", // Label to display for each user in the select dropdown
   });
 
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "end",
-        justifyContent: "space-between",
-        gap: "12px",
+        display: "flex", // Flexbox layout for the form
+        alignItems: "end", // Align items at the bottom
+        justifyContent: "space-between", // Space items evenly
+        gap: "12px", // Add space between elements
       }}
     >
       <Form
@@ -86,11 +73,12 @@ export const UsersForm = ({ initialValues, cancelForm }: Props) => {
             className="kanban-users-form-select"
             dropdownStyle={{ padding: "0px" }}
             style={{ width: "100%" }}
-            mode="multiple"
+            mode="multiple" // Allow multiple selections
           />
         </Form.Item>
       </Form>
       <Space>
+        {/* Buttons for canceling and saving the form */}
         <Button type="default" onClick={cancelForm}>
           Cancel
         </Button>

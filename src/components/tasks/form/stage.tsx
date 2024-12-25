@@ -1,133 +1,97 @@
 import { useForm, useSelect } from "@refinedev/antd";
 import { HttpError } from "@refinedev/core";
-import {
-  GetFields,
-  GetFieldsFromList,
-  GetVariables,
-} from "@refinedev/nestjs-query";
+import { GetFields, GetFieldsFromList, GetVariables } from "@refinedev/nestjs-query";
 
 import { FlagOutlined } from "@ant-design/icons";
 import { Checkbox, Form, Select, Space } from "antd";
 
 import { AccordionHeaderSkeleton } from "@/components";
-import {
-  TaskStagesSelectQuery,
-  UpdateTaskMutation,
-  UpdateTaskMutationVariables,
-} from "@/graphql/types";
-
+import { TaskStagesSelectQuery, UpdateTaskMutation, UpdateTaskMutationVariables } from "@/graphql/types";
 import { UPDATE_TASK_MUTATION } from "@/graphql/mutations";
 import { TASK_STAGES_SELECT_QUERY } from "@/graphql/queries";
 
 type Props = {
-  isLoading?: boolean;
+  isLoading?: boolean; // Indicates if data is still loading
 };
 
 export const StageForm = ({ isLoading }: Props) => {
   // use the useForm hook to manage the form for adding a stage to a task
-  const { formProps } = useForm<
+  const { formProps } = useForm< 
     GetFields<UpdateTaskMutation>,
     HttpError,
-    /**
-     * Pick is a utility type from typescript that allows you to create a new type from an existing type by picking some properties from it.
-     * https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
-     *
-     * Pick<Type, Keys>
-     * Type -> the type from which we want to pick the properties
-     * Keys -> the properties that we want to pick
-     */
     Pick<GetVariables<UpdateTaskMutationVariables>, "stageId" | "completed">
   >({
     queryOptions: {
-      // disable the query to prevent fetching data on component mount
-      enabled: false,
+      enabled: false, // Disable the query to prevent fetching on mount
     },
-
-    /**
-     * autoSave is used to automatically save the form when the value of the form changes. It accepts an object with 2 properties:
-     * enabled: boolean - whether to enable autoSave or not
-     * debounce: number - the debounce time in milliseconds
-     *
-     * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-form/#autosave
-     *
-     * In this case, we are enabling autoSave and setting the debounce time to 0. Means immediately save the form when the value changes.
-     */
     autoSave: {
-      enabled: true,
-      debounce: 0,
+      enabled: true, // Enable autoSave
+      debounce: 0, // Save immediately when a change occurs
     },
-    // specify the mutation that should be performed
     meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
+      gqlMutation: UPDATE_TASK_MUTATION, // Mutation to update the task
     },
   });
 
-  // use the useSelect hook to fetch the task stages and pass it to the select component. This will allow us to select a stage for the task.
-  // https://refine.dev/docs/ui-integrations/ant-design/hooks/use-select/
+  // use the useSelect hook to fetch the task stages and pass it to the select component
   const { selectProps } = useSelect<GetFieldsFromList<TaskStagesSelectQuery>>({
-    // specify the resource that we want to fetch
-    resource: "taskStages",
-    // specify a filter to only fetch the stages with the title "TODO", "IN PROGRESS", "IN REVIEW", "DONE"
+    resource: "taskStages", // Fetch data from "taskStages"
     filters: [
       {
-        field: "title",
-        operator: "in",
+        field: "title", // Filter stages by title
+        operator: "in", // Fetch stages with specific titles
         value: ["TODO", "IN PROGRESS", "IN REVIEW", "DONE"],
       },
     ],
-    // specify a sorter to sort the stages by createdAt in ascending order
     sorters: [
       {
-        field: "createdAt",
+        field: "createdAt", // Sort stages by created date
         order: "asc",
       },
     ],
-    // specify the gqlQuery that should be performed
     meta: {
-      gqlQuery: TASK_STAGES_SELECT_QUERY,
+      gqlQuery: TASK_STAGES_SELECT_QUERY, // Query for fetching task stages
     },
   });
 
+  // Show a skeleton loader while data is being fetched
   if (isLoading) return <AccordionHeaderSkeleton />;
 
   return (
     <div style={{ padding: "12px 24px", borderBottom: "1px solid #d9d9d9" }}>
       <Form
-        layout="inline"
+        layout="inline" // Inline layout for the form
         style={{
-          justifyContent: "space-between",
+          justifyContent: "space-between", // Space between form elements
           alignItems: "center",
         }}
         {...formProps}
       >
         <Space size={5}>
-          <FlagOutlined />
+          <FlagOutlined /> {/* Display an icon for the stage selection */}
           <Form.Item
             noStyle
-            name={["stageId"]}
-            initialValue={formProps?.initialValues?.stage?.id}
+            name={["stageId"]} // Name of the form field for the stage
+            initialValue={formProps?.initialValues?.stage?.id} // Set initial value to the current stage id
           >
             <Select
               {...selectProps}
-              // determines whether the width of the dropdown menu should match the width of the select box.
-              popupMatchSelectWidth={false}
-              // concat the options with an option for unassigned stage
-              options={selectProps.options?.concat([
+              popupMatchSelectWidth={false} // Set dropdown width to not match select box width
+              options={selectProps.options?.concat([ // Add an "Unassigned" option
                 {
                   label: "Unassigned",
                   value: null,
                 },
               ])}
               bordered={false}
-              showSearch={false}
-              placeholder="Select a stage"
-              onSearch={undefined}
-              size="small"
+              showSearch={false} // Disable search in the select box
+              placeholder="Select a stage" // Placeholder text for the dropdown
+              size="small" // Set size to small
             />
           </Form.Item>
         </Space>
         <Form.Item noStyle name="completed" valuePropName="checked">
-          <Checkbox>Mark as complete</Checkbox>
+          <Checkbox>Mark as complete</Checkbox> {/* Checkbox to mark the task as completed */}
         </Form.Item>
       </Form>
     </div>

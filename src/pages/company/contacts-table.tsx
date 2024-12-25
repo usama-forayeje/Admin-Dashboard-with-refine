@@ -21,88 +21,50 @@ import CustomAvatar from "@/components/custom-avatar";
 import { statusOptions } from "@/constant";
 import { ContactStatusTag } from "@/components/tags/contact-status-tag";
 
+// Component to display company contacts in a table
 export const CompanyContactsTable = () => {
-  // get params from the url
+  // Extract parameters from the URL (e.g., company ID)
   const params = useParams();
 
   /**
-   * Refine offers a TanStack Table adapter with @refinedev/react-table that allows us to use the TanStack Table library with Refine.
-   * All features such as sorting, filtering, and pagination come out of the box
-   * Under the hood it uses useList hook to fetch the data.
-   * https://refine.dev/docs/packages/tanstack-table/use-table/#installation
+   * Refine's useTable hook is used to fetch and manage table data.
+   * It comes with built-in support for sorting, filtering, and pagination.
    */
   const { tableProps } = useTable<GetFieldsFromList<CompanyContactsTableQuery>>(
     {
-      // specify the resource for which the table is to be used
-      resource: "contacts",
-      syncWithLocation: false,
-      // specify initial sorters
+      resource: "contacts", // specify the resource to use (contacts)
+      syncWithLocation: false, // disable syncing with location
       sorters: {
-        /**
-         * initial sets the initial value of sorters.
-         * it's not permanent
-         * it will be cleared when the user changes the sorting
-         * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-table/#sortersinitial
-         */
         initial: [
           {
-            field: "createdAt",
-            order: "desc",
+            field: "createdAt", // sort by creation date
+            order: "desc", // descending order
           },
         ],
       },
-      // specify initial filters
       filters: {
-        /**
-         * similar to initial in sorters
-         * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-table/#filtersinitial
-         */
         initial: [
-          {
-            field: "jobTitle",
-            value: "",
-            operator: "contains",
-          },
-          {
-            field: "name",
-            value: "",
-            operator: "contains",
-          },
-          {
-            field: "status",
-            value: undefined,
-            operator: "in",
-          },
+          { field: "jobTitle", value: "", operator: "contains" }, // initial filter for job title
+          { field: "name", value: "", operator: "contains" }, // initial filter for name
+          { field: "status", value: undefined, operator: "in" }, // initial filter for status
         ],
-        /**
-         * permanent filters are the filters that are always applied
-         * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-table/#filterspermanent
-         */
         permanent: [
           {
-            field: "company.id",
+            field: "company.id", // filter by company ID (from URL params)
             operator: "eq",
             value: params?.id as string,
           },
         ],
       },
-      /**
-       * used to provide any additional information to the data provider.
-       * https://refine.dev/docs/data/hooks/use-form/#meta-
-       */
       meta: {
-        // gqlQuery is used to specify the GraphQL query that should be used to fetch the data.
-        gqlQuery: COMPANY_CONTACTS_TABLE_QUERY,
+        gqlQuery: COMPANY_CONTACTS_TABLE_QUERY, // GraphQL query to fetch data
       },
     },
   );
 
   return (
     <Card
-      headStyle={{
-        borderBottom: "1px solid #D9D9D9",
-        marginBottom: "1px",
-      }}
+      headStyle={{ borderBottom: "1px solid #D9D9D9", marginBottom: "1px" }}
       bodyStyle={{ padding: 0 }}
       title={
         <Space size="middle">
@@ -110,49 +72,44 @@ export const CompanyContactsTable = () => {
           <Text>Contacts</Text>
         </Space>
       }
-      // property used to render additional content in the top-right corner of the card
       extra={
         <>
           <Text className="tertiary">Total contacts: </Text>
           <Text strong>
-            {/* if pagination is not disabled and total is provided then show the total */}
             {tableProps?.pagination !== false && tableProps.pagination?.total}
           </Text>
         </>
       }
     >
       <Table
-        {...tableProps}
+        {...tableProps} // Spread table properties to apply pagination, sorting, etc.
         rowKey="id"
         pagination={{
           ...tableProps.pagination,
-          showSizeChanger: false, // hide the page size changer
+          showSizeChanger: false, // Disable page size changer
         }}
       >
+        {/* Column for displaying contact name */}
         <Table.Column<Contact>
           title="Name"
           dataIndex="name"
           render={(_, record) => (
             <Space>
               <CustomAvatar name={record.name} src={record.avatarUrl} />
-              <Text
-                style={{
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <Text style={{ whiteSpace: "nowrap" }}>
                 {record.name}
               </Text>
             </Space>
           )}
-          // specify the icon that should be used for filtering
-          filterIcon={<SearchOutlined />}
-          // render the filter dropdown
+          filterIcon={<SearchOutlined />} // Icon for the filter dropdown
           filterDropdown={(props) => (
             <FilterDropdown {...props}>
               <Input placeholder="Search Name" />
             </FilterDropdown>
           )}
         />
+        
+        {/* Column for displaying job title */}
         <Table.Column
           title="Title"
           dataIndex="jobTitle"
@@ -163,23 +120,25 @@ export const CompanyContactsTable = () => {
             </FilterDropdown>
           )}
         />
+
+        {/* Column for displaying contact status with a tag */}
         <Table.Column<Contact>
           title="Stage"
           dataIndex="status"
-          // render the status tag for each contact
           render={(_, record) => <ContactStatusTag status={record.status} />}
-          // allow filtering by selecting multiple status options
           filterDropdown={(props) => (
             <FilterDropdown {...props}>
               <Select
                 style={{ width: "200px" }}
-                mode="multiple" // allow multiple selection
+                mode="multiple" // Allow multiple selection
                 placeholder="Select Stage"
-                options={statusOptions}
-              ></Select>
+                options={statusOptions} // Options for contact statuses
+              />
             </FilterDropdown>
           )}
         />
+        
+        {/* Column with actions to email or call the contact */}
         <Table.Column<Contact>
           dataIndex="id"
           width={112}

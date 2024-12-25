@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-// Query to get Total Company, Contact and Deal Counts
+// Query to get the total count of companies, contacts, and deals
 export const DASHBOARD_TOTAL_COUNTS_QUERY = gql`
   query DashboardTotalCounts {
     companies {
@@ -15,7 +15,7 @@ export const DASHBOARD_TOTAL_COUNTS_QUERY = gql`
   }
 `;
 
-// Query to get upcoming events
+// Query to get upcoming events in the calendar
 export const DASHBOARD_CALENDAR_UPCOMING_EVENTS_QUERY = gql`
   query DashboardCalendarUpcomingEvents(
     $filter: EventFilter!
@@ -35,7 +35,7 @@ export const DASHBOARD_CALENDAR_UPCOMING_EVENTS_QUERY = gql`
   }
 `;
 
-// Query to get deals chart
+// Query to get deals chart data based on deal stages
 export const DASHBOARD_DEALS_CHART_QUERY = gql`
   query DashboardDealsChart(
     $filter: DealStageFilter!
@@ -43,11 +43,9 @@ export const DASHBOARD_DEALS_CHART_QUERY = gql`
     $paging: OffsetPaging
   ) {
     dealStages(filter: $filter, sorting: $sorting, paging: $paging) {
-      # Get all deal stages
       nodes {
         id
         title
-        # Get the sum of all deals in this stage and group by closeDateMonth and closeDateYear
         dealsAggregate {
           groupBy {
             closeDateMonth
@@ -58,13 +56,12 @@ export const DASHBOARD_DEALS_CHART_QUERY = gql`
           }
         }
       }
-      # Get the total count of all deals in this stage
       totalCount
     }
   }
 `;
 
-// Query to get latest activities deals
+// Query to get latest deals activities
 export const DASHBOARD_LATEST_ACTIVITIES_DEALS_QUERY = gql`
   query DashboardLatestActivitiesDeals(
     $filter: DealFilter!
@@ -91,7 +88,7 @@ export const DASHBOARD_LATEST_ACTIVITIES_DEALS_QUERY = gql`
   }
 `;
 
-// Query to get latest activities audits
+// Query to get latest audit activities
 export const DASHBOARD_LATEST_ACTIVITIES_AUDITS_QUERY = gql`
   query DashboardLatestActivitiesAudits(
     $filter: AuditFilter!
@@ -121,7 +118,7 @@ export const DASHBOARD_LATEST_ACTIVITIES_AUDITS_QUERY = gql`
   }
 `;
 
-// Query to get companies list
+// Query to get the list of companies
 export const COMPANIES_LIST_QUERY = gql`
   query CompaniesList(
     $filter: CompanyFilter!
@@ -134,7 +131,6 @@ export const COMPANIES_LIST_QUERY = gql`
         id
         name
         avatarUrl
-        # Get the sum of all deals in this company
         dealsAggregate {
           sum {
             value
@@ -145,17 +141,15 @@ export const COMPANIES_LIST_QUERY = gql`
   }
 `;
 
-// Query to get users list
+// Query to get the list of users
 export const USERS_SELECT_QUERY = gql`
   query UsersSelect(
     $filter: UserFilter!
     $sorting: [UserSort!]
     $paging: OffsetPaging!
   ) {
-    # Get all users
     users(filter: $filter, sorting: $sorting, paging: $paging) {
-      totalCount # Get the total count of users
-      # Get specific fields for each user
+      totalCount
       nodes {
         id
         name
@@ -165,7 +159,7 @@ export const USERS_SELECT_QUERY = gql`
   }
 `;
 
-// Query to get contacts associated with a company
+// Query to get the contacts associated with a specific company
 export const COMPANY_CONTACTS_TABLE_QUERY = gql`
   query CompanyContactsTable(
     $filter: ContactFilter!
@@ -187,7 +181,7 @@ export const COMPANY_CONTACTS_TABLE_QUERY = gql`
   }
 `;
 
-// Query to get task stages list
+// Query to get the list of task stages
 export const TASK_STAGES_QUERY = gql`
   query TaskStages(
     $filter: TaskStageFilter!
@@ -195,7 +189,7 @@ export const TASK_STAGES_QUERY = gql`
     $paging: OffsetPaging!
   ) {
     taskStages(filter: $filter, sorting: $sorting, paging: $paging) {
-      totalCount # Get the total count of task stages
+      totalCount
       nodes {
         id
         title
@@ -204,7 +198,7 @@ export const TASK_STAGES_QUERY = gql`
   }
 `;
 
-// Query to get tasks list
+// Query to get the list of tasks
 export const TASKS_QUERY = gql`
   query Tasks(
     $filter: TaskFilter!
@@ -212,7 +206,7 @@ export const TASKS_QUERY = gql`
     $paging: OffsetPaging!
   ) {
     tasks(filter: $filter, sorting: $sorting, paging: $paging) {
-      totalCount # Get the total count of tasks
+      totalCount
       nodes {
         id
         title
@@ -220,7 +214,6 @@ export const TASKS_QUERY = gql`
         dueDate
         completed
         stageId
-        # Get user details associated with this task
         users {
           id
           name
@@ -233,7 +226,7 @@ export const TASKS_QUERY = gql`
   }
 `;
 
-// Query to get task stages for select
+// Query to get task stages for selection (in forms, for example)
 export const TASK_STAGES_SELECT_QUERY = gql`
   query TaskStagesSelect(
     $filter: TaskStageFilter!

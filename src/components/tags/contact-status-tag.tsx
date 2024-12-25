@@ -11,7 +11,7 @@ import { Tag, TagProps } from "antd";
 import { ContactStatus } from "@/graphql/schema.types";
 
 type Props = {
-  status: ContactStatus;
+  status: ContactStatus; // The contact status passed as a prop
 };
 
 /**
@@ -19,50 +19,52 @@ type Props = {
  * @param status - The contact status.
  */
 export const ContactStatusTag = ({ status }: Props) => {
-  let icon: React.ReactNode = null;
-  let color: TagProps["color"] = undefined;
+  let icon: React.ReactNode = null; // Variable to hold the icon for the tag
+  let color: TagProps["color"] = undefined; // Variable to hold the tag color
 
+  // Switch case to determine the icon and color based on the contact status
   switch (status) {
     case "NEW":
     case "CONTACTED":
     case "INTERESTED":
-      icon = <PlayCircleOutlined />;
-      color = "cyan";
+      icon = <PlayCircleOutlined />; // Icon for statuses like NEW, CONTACTED, INTERESTED
+      color = "cyan"; // Color for these statuses
       break;
 
     case "UNQUALIFIED":
-      icon = <PlayCircleOutlined />;
-      color = "red";
+      icon = <PlayCircleOutlined />; // Icon for UNQUALIFIED status
+      color = "red"; // Color for UNQUALIFIED status
       break;
 
     case "QUALIFIED":
     case "NEGOTIATION":
-      icon = <PlayCircleFilled />;
-      color = "green";
+      icon = <PlayCircleFilled />; // Icon for QUALIFIED or NEGOTIATION statuses
+      color = "green"; // Color for these statuses
       break;
 
     case "LOST":
-      icon = <PlayCircleFilled />;
-      color = "red";
+      icon = <PlayCircleFilled />; // Icon for LOST status
+      color = "red"; // Color for LOST status
       break;
 
     case "WON":
-      icon = <CheckCircleOutlined />;
-      color = "green";
+      icon = <CheckCircleOutlined />; // Icon for WON status
+      color = "green"; // Color for WON status
       break;
 
     case "CHURNED":
-      icon = <MinusCircleOutlined />;
-      color = "red";
+      icon = <MinusCircleOutlined />; // Icon for CHURNED status
+      color = "red"; // Color for CHURNED status
       break;
 
     default:
-      break;
+      break; // Default case, no icon or color is assigned
   }
 
   return (
+    // Renders a Tag component with the determined icon and color
     <Tag color={color} style={{ textTransform: "capitalize" }}>
-      {icon} {status.toLowerCase()}
+      {icon} {status.toLowerCase()} {/* Displays the icon and the status in lowercase */}
     </Tag>
   );
 };

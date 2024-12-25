@@ -15,62 +15,58 @@ import { UPDATE_TASK_MUTATION } from "@/graphql/mutations";
 
 type Props = {
   initialValues: {
-    description?: Task["description"];
+    description?: Task["description"]; // Initial values for the form, with an optional description
   };
-  cancelForm: () => void;
+  cancelForm: () => void; // Function to call when canceling the form
 };
 
 export const DescriptionForm = ({ initialValues, cancelForm }: Props) => {
-  // use the useForm hook to manage the form
-  // formProps contains all the props that we need to pass to the form (initialValues, onSubmit, etc.)
-  // saveButtonProps contains all the props that we need to pass to the save button
-  const { formProps, saveButtonProps } = useForm<
-    GetFields<UpdateTaskMutation>,
-    HttpError,
-    /**
-     * Pick is a utility type from typescript that allows you to create a new type from an existing type by picking some properties from it.
-     * https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
-     *
-     * Pick<Type, Keys>
-     * Type -> the type from which we want to pick the properties
-     * Keys -> the properties that we want to pick
-     */
-    Pick<GetVariables<UpdateTaskMutationVariables>, "description">
+  // useForm hook is used to manage the form state and handle form submission
+  // formProps contains the necessary props for the form (e.g., initialValues, onSubmit)
+  // saveButtonProps contains the props for the save button (e.g., onClick handler, disabled state)
+  const { formProps, saveButtonProps } = useForm< 
+    GetFields<UpdateTaskMutation>, // Specifies the data type returned by the mutation (task fields)
+    HttpError, // Type of error that can occur (HttpError)
+    Pick<GetVariables<UpdateTaskMutationVariables>, "description"> // Pick the "description" property from the mutation variables
   >({
     queryOptions: {
-      // we are disabling the query because we don't want to fetch the data on component mount.
-      enabled: false, // disable the query
+      enabled: false, // Disables the query on component mount, so no data is fetched initially
     },
-    redirect: false, // disable redirection
-    // when the mutation is successful, call the cancelForm function to close the form
+    redirect: false, // Prevents automatic redirection after mutation success
     onMutationSuccess: () => {
-      cancelForm();
+      cancelForm(); // Calls cancelForm when the mutation (task update) is successful
     },
-    // specify the mutation that should be performed
     meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
+      gqlMutation: UPDATE_TASK_MUTATION, // Specifies the GraphQL mutation to update the task
     },
   });
 
   return (
     <>
+      {/* Form component for managing the description field */}
       <Form {...formProps} initialValues={initialValues}>
         <Form.Item noStyle name="description">
+          {/* MDEditor is used to edit markdown content */}
           <MDEditor preview="edit" data-color-mode="light" height={250} />
         </Form.Item>
       </Form>
+
+      {/* Footer section with Cancel and Save buttons */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "end",
-          marginTop: "12px",
+          justifyContent: "end", // Aligns the buttons to the right
+          marginTop: "12px", // Adds margin to the top
         }}
       >
         <Space>
+          {/* Cancel button, calls cancelForm when clicked */}
           <Button type="default" onClick={cancelForm}>
             Cancel
           </Button>
+
+          {/* Save button, triggers the form submission when clicked */}
           <Button {...saveButtonProps} type="primary">
             Save
           </Button>

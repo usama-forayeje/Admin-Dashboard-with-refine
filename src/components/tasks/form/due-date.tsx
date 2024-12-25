@@ -15,74 +15,69 @@ import { UPDATE_TASK_MUTATION } from "@/graphql/mutations";
 
 type Props = {
   initialValues: {
-    dueDate?: Task["dueDate"];
+    dueDate?: Task["dueDate"]; // Initial values for the form, with an optional dueDate
   };
-  cancelForm: () => void;
+  cancelForm: () => void; // Function to call when canceling the form
 };
 
 export const DueDateForm = ({ initialValues, cancelForm }: Props) => {
-  // use the useForm hook to manage the form
-  // formProps contains all the props that we need to pass to the form (initialValues, onSubmit, etc.)
-  // saveButtonProps contains all the props that we need to pass to the save button
+  // useForm hook to manage the form's state and handle form submission
+  // formProps contains the necessary props for the form (e.g., initialValues, onSubmit)
+  // saveButtonProps contains the props for the save button (e.g., onClick handler, disabled state)
   const { formProps, saveButtonProps } = useForm<
-    GetFields<UpdateTaskMutation>,
-    HttpError,
-    /**
-     * Pick is a utility type from typescript that allows you to create a new type from an existing type by picking some properties from it.
-     * https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
-     *
-     * Pick<Type, Keys>
-     * Type -> the type from which we want to pick the properties
-     * Keys -> the properties that we want to pick
-     */
-    Pick<GetVariables<UpdateTaskMutationVariables>, "dueDate">
+    GetFields<UpdateTaskMutation>, // Specifies the fields returned by the mutation (task fields)
+    HttpError, // Type of error that can occur (HttpError)
+    Pick<GetVariables<UpdateTaskMutationVariables>, "dueDate"> // Picks the "dueDate" property from the mutation variables
   >({
     queryOptions: {
-      // disable the query to prevent fetching data on component mount
-      enabled: false,
+      enabled: false, // Disables query on component mount, so no data is fetched initially
     },
-    redirect: false, // disable redirection
-    // when the mutation is successful, call the cancelForm function to close the form
+    redirect: false, // Prevents automatic redirection after mutation success
     onMutationSuccess: () => {
-      cancelForm();
+      cancelForm(); // Calls cancelForm when the mutation (task update) is successful
     },
-    // specify the mutation that should be performed
     meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
+      gqlMutation: UPDATE_TASK_MUTATION, // Specifies the GraphQL mutation to update the task
     },
   });
 
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        display: "flex", // Displays the form and buttons in a row
+        alignItems: "center", // Centers the items vertically
+        justifyContent: "space-between", // Spaces the form and buttons apart
       }}
     >
       <Form {...formProps} initialValues={initialValues}>
         <Form.Item
           noStyle
-          name="dueDate"
+          name="dueDate" // Binds the DatePicker to the "dueDate" field in the form
           getValueProps={(value) => {
+            // Converts the value to dayjs format when it is non-null
             if (!value) return { value: undefined };
-            return { value: dayjs(value) };
+            return { value: dayjs(value) }; // Converts the date to dayjs format
           }}
         >
           <DatePicker
-            format="YYYY-MM-DD HH:mm"
+            format="YYYY-MM-DD HH:mm" // Date format for the DatePicker
             showTime={{
-              showSecond: false,
-              format: "HH:mm",
+              showSecond: false, // Hides the seconds part of the time
+              format: "HH:mm", // Displays time in HH:mm format
             }}
-            style={{ backgroundColor: "#fff" }}
+            style={{ backgroundColor: "#fff" }} // Custom style for the DatePicker
           />
         </Form.Item>
       </Form>
+      
+      {/* Cancel and Save buttons */}
       <Space>
+        {/* Cancel button, calls cancelForm when clicked */}
         <Button type="default" onClick={cancelForm}>
           Cancel
         </Button>
+
+        {/* Save button, triggers the form submission when clicked */}
         <Button {...saveButtonProps} type="primary">
           Save
         </Button>

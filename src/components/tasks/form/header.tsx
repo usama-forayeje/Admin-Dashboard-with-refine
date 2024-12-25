@@ -1,27 +1,24 @@
 import { MarkdownField } from "@refinedev/antd";
-
 import { Typography, Space, Tag } from "antd";
-
 import dayjs from "dayjs";
 
 import { Text, UserTag } from "@/components";
-
 import { Task } from "@/graphql/schema.types";
 import { getDateColor } from "@/utils";
 
 type DescriptionProps = {
-  description?: Task["description"];
+  description?: Task["description"]; // Optional description of the task
 };
 
 type DueDateProps = {
-  dueData?: Task["dueDate"];
+  dueData?: Task["dueDate"]; // Optional due date of the task
 };
 
 type UserProps = {
-  users?: Task["users"];
+  users?: Task["users"]; // Optional list of users assigned to the task
 };
 
-// display a task's descriptio if it exists, otherwise display a link to add one
+// Display the task's description if it exists, otherwise show a link to add one
 export const DescriptionHeader = ({ description }: DescriptionProps) => {
   if (description) {
     return (
@@ -31,57 +28,55 @@ export const DescriptionHeader = ({ description }: DescriptionProps) => {
     );
   }
 
-  // if the task doesn't have a description, display a link to add one
+  // If the task doesn't have a description, display a link to add one
   return <Typography.Link>Add task description</Typography.Link>;
 };
 
-// display a task's due date if it exists, otherwise display a link to add one
+// Display the task's due date if it exists, otherwise show a link to add one
 export const DueDateHeader = ({ dueData }: DueDateProps) => {
   if (dueData) {
-    // get the color of the due date
+    // Get the color for the due date tag based on its proximity
     const color = getDateColor({
       date: dueData,
-      defaultColor: "processing",
+      defaultColor: "processing", // Default color if no condition matches
     });
 
-    // depending on the due date, display a different color and text
+    // Function to return appropriate tag text based on the due date color
     const getTagText = () => {
       switch (color) {
         case "error":
-          return "Overdue";
-
+          return "Overdue"; // Overdue task
         case "warning":
-          return "Due soon";
-
+          return "Due soon"; // Task due soon
         default:
-          return "Processing";
+          return "Processing"; // Task in progress
       }
     };
 
     return (
       <Space size={[0, 8]}>
         <Tag color={color}>{getTagText()}</Tag>
-        <Text>{dayjs(dueData).format("MMMM D, YYYY - h:ma")}</Text>
+        <Text>{dayjs(dueData).format("MMMM D, YYYY - h:ma")}</Text> {/* Format and display the due date */}
       </Space>
     );
   }
 
-  // if the task doesn't have a due date, display a link to add one
+  // If the task doesn't have a due date, display a link to add one
   return <Typography.Link>Add due date</Typography.Link>;
 };
 
-// display a task's users if it exists, otherwise display a link to add one
+// Display the task's assigned users if they exist, otherwise show a link to add one
 export const UsersHeader = ({ users = [] }: UserProps) => {
   if (users.length > 0) {
     return (
       <Space size={[0, 8]} wrap>
         {users.map((user) => (
-          <UserTag key={user.id} user={user} />
+          <UserTag key={user.id} user={user} /> 
         ))}
       </Space>
     );
   }
 
-  // if the task doesn't have users, display a link to add one
+  // If no users are assigned, display a link to assign users
   return <Typography.Link>Assign to users</Typography.Link>;
 };

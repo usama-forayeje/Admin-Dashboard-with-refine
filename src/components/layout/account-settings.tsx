@@ -1,93 +1,62 @@
-import { SaveButton, useForm } from "@refinedev/antd";
-import { HttpError } from "@refinedev/core";
-import { GetFields, GetVariables } from "@refinedev/nestjs-query";
+import { SaveButton, useForm } from "@refinedev/antd"; // Import form handling and save button
+import { HttpError } from "@refinedev/core"; // Error type for HTTP errors
+import { GetFields, GetVariables } from "@refinedev/nestjs-query"; // Utility for handling GraphQL queries
 
-import { CloseOutlined } from "@ant-design/icons";
-import { Button, Card, Drawer, Form, Input, Spin } from "antd";
+import { CloseOutlined } from "@ant-design/icons"; // Close icon
+import { Button, Card, Drawer, Form, Input, Spin } from "antd"; // Ant Design components
 
-import { getNameInitials } from "../../utils/get-name-initial";
-import { UPDATE_USER_MUTATION } from "@/graphql/mutations";
+import { getNameInitials } from "../../utils/get-name-initial"; // Utility to get name initials
+import { UPDATE_USER_MUTATION } from "@/graphql/mutations"; // GraphQL mutation for updating user info
 
-import { Text } from "../text";
-import CustomAvatar from "../custom-avatar";
+import { Text } from "../text"; // Custom Text component
+import CustomAvatar from "../custom-avatar"; // Custom Avatar component
 
 import {
   UpdateUserMutation,
   UpdateUserMutationVariables,
-} from "@/graphql/types";
+} from "@/graphql/types"; // GraphQL types
 
+// Props for the component
 type Props = {
-  opened: boolean;
-  setOpened: (opened: boolean) => void;
-  userId: string;
+  opened: boolean; // Whether the drawer is open
+  setOpened: (opened: boolean) => void; // Function to toggle drawer state
+  userId: string; // ID of the user being edited
 };
 
 export const AccountSettings = ({ opened, setOpened, userId }: Props) => {
   /**
-   * useForm in Refine is used to manage forms. It provides us with a lot of useful props and methods that we can use to manage forms.
-   * https://refine.dev/docs/data/hooks/use-form/#usage
-   */
-
-  /**
-   * saveButtonProps -> contains all the props needed by the "submit" button. For example, "loading", "disabled", "onClick", etc.
-   * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-form/#savebuttonprops
-   *
-   * formProps -> It's an instance of HTML form that manages form state and actions like onFinish, onValuesChange, etc.
-   * https://refine.dev/docs/ui-integrations/ant-design/hooks/use-form/#form
-   *
-   * queryResult -> contains the result of the query. For example, isLoading, data, error, etc.
-   * https://refine.dev/docs/packages/react-hook-form/use-form/#queryresult
+   * `useForm` hook manages the form state and actions
+   * - saveButtonProps: Props for the save button (loading, disabled, etc.)
+   * - formProps: Props for the form (onFinish, validation, etc.)
+   * - queryResult: Contains data, loading state, and errors from the query
    */
   const { saveButtonProps, formProps, queryResult } = useForm<
-    /**
-     * GetFields is used to get the fields of the mutation i.e., in this case, fields are name, email, jobTitle, and phone
-     * https://refine.dev/docs/data/packages/nestjs-query/#getfields
-     */
-    GetFields<UpdateUserMutation>,
-    // a type that represents an HTTP error. Used to specify the type of error mutation can throw.
-    HttpError,
-    // A third type parameter used to specify the type of variables for the UpdateUserMutation. Meaning that the variables for the UpdateUserMutation should be of type UpdateUserMutationVariables
-    GetVariables<UpdateUserMutationVariables>
+    GetFields<UpdateUserMutation>, // Fields of the update mutation
+    HttpError, // Type of error returned
+    GetVariables<UpdateUserMutationVariables> // Variables needed for the mutation
   >({
-    /**
-     * mutationMode is used to determine how the mutation should be performed. For example, optimistic, pessimistic, undoable etc.
-     * optimistic -> redirection and UI updates are executed immediately as if the mutation is successful.
-     * pessimistic -> redirection and UI updates are executed after the mutation is successful.
-     * https://refine.dev/docs/advanced-tutorials/mutation-mode/#overview
-     */
-    mutationMode: "optimistic",
-    /**
-     * specify on which resource the mutation should be performed
-     * if not specified, Refine will determine the resource name by the current route
-     */
-    resource: "users",
-    /**
-     * specify the action that should be performed on the resource. Behind the scenes, Refine calls useOne hook to get the data of the user for edit action.
-     * https://refine.dev/docs/data/hooks/use-form/#edit
-     */
-    action: "edit",
-    id: userId,
-    /**
-     * used to provide any additional information to the data provider.
-     * https://refine.dev/docs/data/hooks/use-form/#meta-
-     */
+    mutationMode: "optimistic", // Immediately updates the UI as if mutation succeeded
+    resource: "users", // Resource name
+    action: "edit", // Edit action triggers the `useOne` hook to fetch data
+    id: userId, // ID of the user being edited
     meta: {
-      // gqlMutation is used to specify the mutation that should be performed.
-      gqlMutation: UPDATE_USER_MUTATION,
+      gqlMutation: UPDATE_USER_MUTATION, // GraphQL mutation to update user
     },
   });
-  const { avatarUrl, name } = queryResult?.data?.data || {};
 
+  const { avatarUrl, name } = queryResult?.data?.data || {}; // Get user data from the query
+
+  // Function to close the drawer
   const closeModal = () => {
     setOpened(false);
   };
 
-  // if query is processing, show a loading indicator
+  // Show a loading spinner while data is being fetched
   if (queryResult?.isLoading) {
     return (
       <Drawer
         open={opened}
-        width={756}
+        width={756} // Drawer width
         styles={{
           body: {
             background: "#f5f5f5",
@@ -97,21 +66,22 @@ export const AccountSettings = ({ opened, setOpened, userId }: Props) => {
           },
         }}
       >
-        <Spin />
+        <Spin /> {/* Loading spinner */}
       </Drawer>
     );
   }
 
   return (
     <Drawer
-      onClose={closeModal}
+      onClose={closeModal} // Close drawer on close
       open={opened}
       width={756}
       styles={{
         body: { background: "#f5f5f5", padding: 0 },
-        header: { display: "none" },
+        header: { display: "none" }, // Hide header
       }}
     >
+      {/* Header section */}
       <div
         style={{
           display: "flex",
@@ -121,48 +91,52 @@ export const AccountSettings = ({ opened, setOpened, userId }: Props) => {
           backgroundColor: "#fff",
         }}
       >
-        <Text strong>Account Settings</Text>
+        <Text strong>Account Settings</Text> {/* Header title */}
         <Button
           type="text"
-          icon={<CloseOutlined />}
-          onClick={() => closeModal()}
+          icon={<CloseOutlined />} // Close icon
+          onClick={() => closeModal()} // Close drawer on click
         />
       </div>
+
+      {/* Form section */}
       <div
         style={{
           padding: "16px",
         }}
       >
         <Card>
-          <Form {...formProps} layout="vertical">
+          <Form {...formProps} layout="vertical"> {/* Form layout */}
             <CustomAvatar
-              shape="square"
-              src={avatarUrl}
-              name={getNameInitials(name || "")}
+              shape="square" // Avatar shape
+              src={avatarUrl} // User's avatar URL
+              name={getNameInitials(name || "")} // User's initials
               style={{
                 width: 96,
                 height: 96,
                 marginBottom: "24px",
               }}
             />
+            {/* Input fields for user details */}
             <Form.Item label="Name" name="name">
               <Input placeholder="Name" />
             </Form.Item>
             <Form.Item label="Email" name="email">
-              <Input placeholder="email" />
+              <Input placeholder="Email" />
             </Form.Item>
             <Form.Item label="Job title" name="jobTitle">
-              <Input placeholder="jobTitle" />
+              <Input placeholder="Job Title" />
             </Form.Item>
             <Form.Item label="Phone" name="phone">
-              <Input placeholder="Timezone" />
+              <Input placeholder="Phone" />
             </Form.Item>
           </Form>
+          {/* Save button */}
           <SaveButton
-            {...saveButtonProps}
+            {...saveButtonProps} // Save button props
             style={{
               display: "block",
-              marginLeft: "auto",
+              marginLeft: "auto", // Align button to the right
             }}
           />
         </Card>
